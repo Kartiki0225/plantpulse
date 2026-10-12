@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Plant overview</h1>
+    <p class="muted">OEE = Availability × Performance × Quality. World-class plants reach about 85%.</p>
+  </div>
+  <form class="range" method="get">
+    <label>From <input type="date" name="from" value="{{ start }}"></label>
+    <label>To <input type="date" name="to" value="{{ end }}"></label>
+    <button class="button secondary" type="submit">Apply</button>
+  </form>
+</div>
+
+<!-- dashboard.js fills everything below using the /api/... endpoints -->
+<section class="kpis" id="kpis" data-from="{{ start }}" data-to="{{ end }}">
+  <div class="card kpi main"><span class="label">OEE</span><strong id="kpi-oee">–</strong><span class="muted" id="kpi-logs"></span></div>
+  <div class="card kpi"><span class="label">Availability</span><strong id="kpi-availability">–</strong><span class="muted" id="kpi-downtime"></span></div>
+  <div class="card kpi"><span class="label">Performance</span><strong id="kpi-performance">–</strong><span class="muted" id="kpi-parts"></span></div>
+  <div class="card kpi"><span class="label">Quality</span><strong id="kpi-quality">–</strong><span class="muted" id="kpi-rejected"></span></div>
+</section>
+
+<p class="empty" id="empty" hidden>No production logs in this date range. Pick other dates or <a href="{{ url_for('log_production') }}">log production</a>.</p>
+
+<section class="grid-2">
+  <div class="card">
+    <h2>OEE per machine</h2>
+    <table>
+      <thead>
+        <tr><th>Machine</th><th>Line</th><th class="num">Avail.</th><th class="num">Perf.</th><th class="num">Quality</th><th class="wide">OEE</th></tr>
+      </thead>
+      <tbody id="machine-rows"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Top causes of downtime</h2>
+    <div class="chart"><canvas id="downtime-chart"></canvas></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Daily OEE</h2>
+  <div class="chart"><canvas id="trend-chart"></canvas></div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

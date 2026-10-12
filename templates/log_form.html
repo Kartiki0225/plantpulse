@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Log production{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Log production</h1>
+    <p class="muted">One entry per machine, per shift, per day.</p>
+  </div>
+</div>
+
+<form class="card form" method="post">
+  <div class="fields">
+    <label>Machine
+      <select name="machine_id" required>
+        <option value="">Choose a machine</option>
+        {% for machine in machines %}
+          <option value="{{ machine.id }}" {% if form.get('machine_id') == machine.id|string %}selected{% endif %}>
+            {{ machine.name }} ({{ machine.line }})
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Shift
+      <select name="shift_id" required>
+        <option value="">Choose a shift</option>
+        {% for shift in shifts %}
+          <option value="{{ shift.id }}" {% if form.get('shift_id') == shift.id|string %}selected{% endif %}>
+            {{ shift.name }} ({{ shift.start_time }} to {{ shift.end_time }})
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Date
+      <input type="date" name="log_date" value="{{ form.get('log_date', today) }}" max="{{ today }}" required>
+    </label>
+
+    <label>Total parts made
+      <input type="number" name="total_parts" min="0" value="{{ form.get('total_parts', '') }}" required>
+    </label>
+
+    <label>Rejected parts
+      <input type="number" name="rejected_parts" min="0" value="{{ form.get('rejected_parts', '0') }}" required>
+    </label>
+  </div>
+
+  <h2>Downtime</h2>
+  <p class="muted">Add one row for each stoppage. Leave empty if the machine ran the whole shift.</p>
+
+  <div id="downtime-rows">
+    <div class="downtime-row">
+      <select name="reason_id">
+        <option value="">Reason</option>
+        {% for reason in reasons %}
+          <option value="{{ reason.id }}">{{ reason.name }}</option>
+        {% endfor %}
+      </select>
+      <input type="number" name="minutes" min="1" placeholder="Minutes">
+    </div>
+  </div>
+  <button class="link" type="button" id="add-row">+ Add another stoppage</button>
+
+  <div class="actions">
+    <button class="button" type="submit">Save log</button>
+    <a class="button secondary" href="{{ url_for('logs') }}">Cancel</a>
+  </div>
+</form>
+
+<script>
+  // Copy the first downtime row, clear it, and add it to the end.
+  document.getElementById("add-row").addEventListener("click", () => {
+    const rows = document.getElementById("downtime-rows");
+    const copy = rows.firstElementChild.cloneNode(true);
+    copy.querySelector("select").value = "";
+    copy.querySelector("input").value = "";
+    rows.appendChild(copy);
+  });
+</script>
+{% endblock %}

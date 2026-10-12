@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Logs{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Production logs</h1>
+    <p class="muted">The {{ logs|length }} most recent entries, newest first.</p>
+  </div>
+</div>
+
+<div class="card">
+  {% if logs %}
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th><th>Machine</th><th>Shift</th>
+        <th class="num">Parts</th><th class="num">Rejected</th><th class="num">Downtime</th><th class="num">OEE</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>{{ log.log_date }}</td>
+        <td>{{ log.machine_name }}</td>
+        <td class="muted">{{ log.shift_name }}</td>
+        <td class="num">{{ log.total_parts }}</td>
+        <td class="num">{{ log.rejected_parts }}</td>
+        <td class="num">{{ log.downtime_minutes }} min</td>
+        <td class="num">
+          <b class="{{ 'good' if log.oee >= 0.85 else 'ok' if log.oee >= 0.6 else 'poor' }}">{{ '%.1f' % (log.oee * 100) }}%</b>
+        </td>
+        <td class="num">
+          <form method="post" action="{{ url_for('delete_log', log_id=log.log_id) }}"
+                onsubmit="return confirm('Delete this log?')">
+            <button class="link danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No logs yet. <a href="{{ url_for('log_production') }}">Log production</a> to get started.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Machines{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Machines</h1>
+    <p class="muted">The ideal rate is how many parts per hour a machine makes when it runs perfectly.</p>
+  </div>
+</div>
+
+<section class="grid-2">
+  <div class="card">
+    <table>
+      <thead><tr><th>Machine</th><th>Line</th><th class="num">Ideal rate</th></tr></thead>
+      <tbody>
+        {% for machine in machines %}
+        <tr>
+          <td>{{ machine.name }}</td>
+          <td class="muted">{{ machine.line }}</td>
+          <td class="num">{{ machine.ideal_rate_per_hour }} parts/hour</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="empty">No machines yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <form class="card form" method="post">
+    <h2>Add a machine</h2>
+    <label>Name <input name="name" placeholder="CNC Lathe 3" required></label>
+    <label>Line <input name="line" placeholder="Line A" required></label>
+    <label>Ideal rate (parts per hour) <input type="number" name="ideal_rate_per_hour" min="1" required></label>
+    <div class="actions"><button class="button" type="submit">Add machine</button></div>
+  </form>
+</section>
+{% endblock %}
